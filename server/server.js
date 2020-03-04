@@ -1,11 +1,6 @@
-const express       = require ('express');
-const app    = express ();
-const http        = require('http').Server(app);
-const io = require('socket.io')(http);
-const {users,rooms} = require('./server/state');
-const path          = require ('path');
-
-
+const server = require('http').createServer();
+const io = require('socket.io')(server);
+const {users,rooms} = require('./state');
 
 /**
  * The register operation
@@ -15,7 +10,7 @@ const path          = require ('path');
 const register = (data,client) => {
     if(users.push(data.username)){
         client.username = data.username
-        client.emit('rooms',rooms.rooms.map(room => room.name))
+        console.log('User `'+data.username+'` connected')
     } else client.close()
 }
 /**
@@ -43,10 +38,10 @@ const leave = (data,client) => {
 const message = (data,client) => {
     if(rooms.hasUser(data.room,client.username)) {
         console.log('`'+client.username+'` sent a message to room `'+data.room+'`')
-        client.to(data.room).emit('chat-message',data)
+        client.to(data.room).emit('request',data.message)
     } else {
         console.log("Message from `"+client.username+"` for room `"+data.room+"` rejected")
-        client.emit('err',{'status':400,'chat-message':'You haven\'t joined '+data.room})
+        client.emit('err',{'status':400,'message':'You haven\'t joined '+data.room})
     }
 }
 
@@ -61,17 +56,12 @@ const disconnect = (client) => {
  */
 const methods = (client) => {
     console.log('connect');
-    client.on('chat-message', (data) => message(data,client));
+    client.on('message', (data) => message(data,client));
     client.on('register',(data) => register(data,client));
     client.on('disconnect', () => disconnect(client));
     client.on('join', (data) => join(data,client));
     client.on('leave', (data) => leave(data,client))
 }
 
-app.use (express.static (path.join (__dirname, 'public')));
-app.get ('/', function (req, res) {
-    res.sendFile (path.join (__dirname, './public', 'index.html'));
-});
-
 io.on('connection', methods);
-http.listen(3000)
+server.listen(3000)

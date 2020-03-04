@@ -7,9 +7,19 @@
 
 
     
-    const socket = io ('http://localhost:3003');
-    socket.on ('connection', function () {
+    const socket = io ('http://localhost:3000');
+    socket.on ('connect', function () {
+        socket.emit('register',{'username':'Giuseppi'})
+        socket.emit('join',{'room':'Tomare'})
         console.log ('==> on.connect');
+    });
+
+    socket.on('join', function(data){
+        console.log(data)
+    })
+
+    socket.on('rooms', function(data) {
+        console.log(data)
     });
 
     socket.on ('chat-message', function  (data) {
@@ -20,6 +30,7 @@
         m.push ({
             author: data.author,
             text: data.text
+            /** room **/
         });
         messages = m;
         messagesCount += 1;
