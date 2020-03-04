@@ -32,11 +32,11 @@
     {#each messages as m, i}
         {#if m.author === author}
             <div class="mine clearfix">
-                <div class="message animated ">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
+                <div class="message animated softZoomIn">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
             </div>
         {:else}
             <div class="their">
-                <div class="message animated softFadeInUp">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
+                <div class="message animated softZoomIn">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
             </div>
         {/if}
 	{/each}

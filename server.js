@@ -23,7 +23,10 @@ io.on ('connection', function (socket) {
 
     socket.on ('chat-message', function (data) {
         console.log ('chat-message', data);
-        socket.emit ('chat-message', data);
+        socket.emit ('chat-message', {
+            author: 0,
+            text: 'negro'
+        });
     });
 });
 

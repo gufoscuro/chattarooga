@@ -14,6 +14,15 @@
 
     socket.on ('chat-message', function  (data) {
         console.log ('===> chat-message', data);
+
+        var m = [...messages];
+
+        m.push ({
+            author: data.author,
+            text: data.text
+        });
+        messages = m;
+        messagesCount += 1;
     })
 
     const dispatch = createEventDispatcher ();
@@ -64,18 +73,15 @@
 
         messagesCount += 1;
         messages = m;
-        autoAnswer ();
+        // autoAnswer ();
     }
 
     function handle_messages (data) {
-        if (data.type === 'message')
-            addMessage (data.detail.text);
-
-        // console.log ('handle_messages', data)
+        addMessage (data.detail.text);
     }
 
     function handle_writing (data) {
-        console.log ('handle_writing', data.detail)
+        // console.log ('handle_writing', data.detail)
         socket.emit ('user-writing', {
             writing: data.detail,
             author: currentAuthor

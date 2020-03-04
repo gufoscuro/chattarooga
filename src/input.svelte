@@ -8,9 +8,11 @@
     let textarea;
     let writing = false;
 
-    function emitWriting (bool) {
-        dispatch ('writing', bool);
+    $: {
+        dispatch ('writing', writing);
     }
+    
+
     function sendMessage () {
         if (message.trim () !== '') {
             let m = message.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim();
@@ -21,25 +23,25 @@
         }
         textarea.focus ();
     }
+    
     function handleKeydown (event) {
         if (event.keyCode === 13 && event.shiftKey === false) {
             event.preventDefault ();
-            emitWriting (false);
             writing = false;
             sendMessage ();
-        } else if (message !== '' && writing === false) {
+        }
+    }
+    
+    function handleKeyup (event) {
+        if (message !== '' && writing === false) 
             writing = true;
-            emitWriting (true);
-        }
-        else if (message === '' && writing === true) {
+        else if (message === '' && writing === true) 
             writing = false;
-            emitWriting (false);
-        }
-	}
+    }
 </script>
 
 <div class={"Input" + (roomsActive ? ' with-rooms' : '')}>
-    <textarea bind:value={message} placeholder="enter message here" bind:this={textarea} on:keydown={handleKeydown}/>
+    <textarea bind:value={message} placeholder="enter message here" bind:this={textarea} on:keydown={handleKeydown} on:keyup={handleKeyup}/>
     <div class="send-button" on:click={sendMessage}>
         <i class="far fa-envelope"></i>
     </div>
