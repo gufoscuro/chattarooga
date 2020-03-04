@@ -96,7 +96,7 @@
         font-size: 14px;
         padding: 2px 10px;
         border-radius: 4px;
-        margin-bottom: 5px;
+        margin-bottom: 2px;
         background-color: #74b9ff;
         color: #fff;
         -webkit-animation-duration: .2s;
