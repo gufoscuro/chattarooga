@@ -1,5 +1,7 @@
 <script>
     import io from 'socket.io-client';
+    import { Remarkable } from 'remarkable';
+
     import { createEventDispatcher } from 'svelte';
     import Messages from './messages.svelte';
     import Input from './input.svelte';
@@ -7,7 +9,7 @@
     
     export let roomsActive;
 
-    
+    const md            = new Remarkable ();
     const dispatch      = createEventDispatcher ();
     const socket        = io (window.location.href.indexOf ('localhost:') !== -1 ? 
         'http://localhost:3000' : 'https://chattarooga.herokuapp.com');
@@ -33,21 +35,19 @@
     
     
     socket.on ('connect', function () {
-        console.log ('===> connect')
+        // console.log ('===> connect')
     });
+    
     socket.on ('username', function (data) {
-        console.log ('===> username', data.username)
         tempUsername = data.username;
         loginActive = true;
-        // username = data.username
-        // socket.emit ('register', { 'username': username });
-        // socket.emit ('join', { 'room': 'Tomare' })
     });
 
     socket.on ('join', function (data) {
-        // console.log ('==> join', data)
-        if (data.joined)
+        if (data.joined) {
             joinedRoom = data.room;
+            addMessage ('system', (username + ' connected @ ' + new Date().toLocaleString ()), 'system');
+        }
     });
 
     socket.on ('rooms', function (data) {
@@ -55,12 +55,11 @@
     });
 
     socket.on ('chat-message', function  (data) {
-        // console.log ('===> chat-message', data);
-
         var m = [...messages];
-
+        
         m.push ({
             id: messagesCount,
+            type: data.type,
             author: data.author,
             text: data.text,
             room: data.room
@@ -69,36 +68,14 @@
         messagesCount += 1;
     });
 
-    
 
-    
 
-    function autoAnswer () {
-        const s = [
-            "Hello there",
-            "Nope",
-            "Howdy?",
-            "What about some cheese?",
-            "Shame on you, bastard."
-        ]
-        setTimeout (() => {
-            var m = [...messages],
-                r = Math.floor(Math.random() * (s.length - 1)) + 1;
 
-            m.push ({
-                author: 1,
-                text: s[r]
-            });
-            messages = m;
-            messagesCount += 1;
-        }, 2000)
-    }
-
-    function addMessage (text) {
+    function addMessage (author, text, type = 'user-message') {
         var m = [...messages],
             d = {
-                id: messagesCount,
-                author: username,
+                type: type,
+                author: author,
                 text: text,
                 room: joinedRoom
             };
@@ -110,8 +87,9 @@
         messages = m;
     }
 
-    function handle_messages (data) {
-        addMessage (data.detail.text);
+    function new_message (data) {
+        let md_text = md.render (data.detail.text);
+        addMessage (username, md_text);
     }
 
     function handle_writing (data) {
@@ -123,7 +101,6 @@
     }
 
     function onLogin () {
-        // console.log ('==> login', tempUsername)
         username = tempUsername;
         socket.emit ('register', { 'username': username });
         socket.emit ('join', { 'room': 'Tomare' });
@@ -131,11 +108,13 @@
     }
 </script>
 
+
 <div class={"Chat" + (roomsActive ? ' with-rooms' : '')}>
     <Messages messages={messages} author={username} roomsActive={roomsActive} />
-    <Input on:message={handle_messages} on:writing={handle_writing} active={inputActive} roomsActive={roomsActive} />
+    <Input on:message={new_message} on:writing={handle_writing} active={inputActive} roomsActive={roomsActive} />
 </div>
 <Login active={loginActive} username={tempUsername} on:login={onLogin} />
+
 
 <style>
     .Chat {

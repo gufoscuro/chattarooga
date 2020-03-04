@@ -30,13 +30,23 @@
 <svelte:window on:scroll={onWindowScroll}/>
 
 <div class={"Messages" + (roomsActive ? ' with-rooms' : '')} bind:this={messages_ref}>
-    {#each messages as m, i (m.id)}
-        {#if (i === 0 || (i > 0 && m.author !== messages[i-1].author))}
-            <div class={"username " + (m.author === author ? 'mine' : 'their')}>{m.author} {(m.author === author ? '(you)' : '')}</div>
+    {#each messages as m, i}
+        {#if (m.type === 'system')}
+            <div class="system-message">{m.text}</div>
+        {:else}
+            {#if (i === 0 || (i > 0 && m.author !== messages[i-1].author))}
+                <div class={"username " + (m.author === author ? 'mine' : 'their')}>{m.author} {(m.author === author ? '(you)' : '')}</div>
+            {/if}
+            <div class={"clearfix " + (m.author === author ? 'mine' : 'their')}>
+                <div class="message">
+                    {#if (m.text.indexOf ('<pre><code>') !== -1)}
+                        <div class="message-code animated softFadeInUp">{@html m.text}</div>
+                    {:else}
+                        <div class="message-bubble animated softZoomIn">{@html m.text}</div>
+                    {/if}
+                </div>
+            </div>
         {/if}
-        <div class={"clearfix " + (m.author === author ? 'mine' : 'their')}>
-            <div class="message animated softZoomIn">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
-        </div>
 	{/each}
 </div>
 
@@ -94,9 +104,12 @@
 
     .Messages :global(.message) {
         font-size: 14px;
-        padding: 2px 10px;
-        border-radius: 4px;
         margin-bottom: 2px;
+    }
+    .Messages :global(.message-bubble) {
+        display: inline-block;
+        padding: 2px 13px;
+        border-radius: 3px;
         background-color: #74b9ff;
         color: #fff;
         -webkit-animation-duration: .2s;
@@ -115,6 +128,31 @@
     .Messages :global(.mine) :global(.message) {
         float: right;
         width: 60%;
+        text-align:right;
+    }
+    .Messages :global(.mine) :global(.message-bubble) {
         background-color: #00cec9;
+    }
+
+    .Messages :global(.message-bubble) :global(p,h1,h2,h3,h4,h5,h6,br,pre) {
+        margin: 0;
+        padding: 0;
+    }
+    .Messages :global(.message-code) {
+        background-color: #fff;
+        padding: 5px 10px;
+        text-align: left;
+        border: 1px solid #d4e2ea;
+        margin: 15px 0;
+
+        -webkit-animation-duration: .2s;
+        animation-duration: .2s;
+    }
+
+    .Messages :global(.system-message) {
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        margin: 10px 0;
     }
 </style>
