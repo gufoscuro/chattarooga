@@ -20,7 +20,7 @@ class Users {
 
     remove(username) {
         if(this.exists(username)) {
-            this.users = _.remove(this.users,username)
+            _.remove(this.users,username)
             return true
         } else
             return false
