@@ -8,7 +8,8 @@
     let messages_ref;
     let scrollY     = 0,
         following   = true,
-        timer       = null;
+        timer       = null,
+        lastAuthor  = '';
 
     function onWindowScroll (event) {
         following = window.scrollY == scrollY
@@ -29,16 +30,13 @@
 <svelte:window on:scroll={onWindowScroll}/>
 
 <div class={"Messages" + (roomsActive ? ' with-rooms' : '')} bind:this={messages_ref}>
-    {#each messages as m, i}
-        {#if m.author === author}
-            <div class="mine clearfix">
-                <div class="message animated softZoomIn">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
-            </div>
-        {:else}
-            <div class="their">
-                <div class="message animated softZoomIn">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
-            </div>
+    {#each messages as m, i (m.id)}
+        {#if (i === 0 || (i > 0 && m.author !== messages[i-1].author))}
+            <div class={"username " + (m.author === author ? 'mine' : 'their')}>{m.author} {(m.author === author ? '(you)' : '')}</div>
         {/if}
+        <div class={"clearfix " + (m.author === author ? 'mine' : 'their')}>
+            <div class="message animated softZoomIn">{@html m.text !== undefined ? m.text.replace (/\n/g, '<br>') : ''}</div>
+        </div>
 	{/each}
 </div>
 
@@ -103,6 +101,13 @@
         color: #fff;
         -webkit-animation-duration: .2s;
         animation-duration: .2s;
+    }
+    .Messages :global(.username) {
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .Messages :global(.username.mine) {
+        text-align: right;
     }
     .Messages :global(.their) :global(.message) {
         width: 60%;

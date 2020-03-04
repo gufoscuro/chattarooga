@@ -5,40 +5,11 @@
     import Input from './input.svelte';
     export let roomsActive;
 
+    const dispatch      = createEventDispatcher ();
+    const username      = generateDumbName ();
+    const currentAuthor = username;
 
-    
-    const socket = io ('http://localhost:3000');
-    socket.on ('connect', function () {
-        socket.emit('register',{'username':'Giuseppi'})
-        socket.emit('join',{'room':'Tomare'})
-        console.log ('==> on.connect');
-    });
-
-    socket.on('join', function(data){
-        console.log(data)
-    })
-
-    socket.on('rooms', function(data) {
-        console.log(data)
-    });
-
-    socket.on ('chat-message', function  (data) {
-        console.log ('===> chat-message', data);
-
-        var m = [...messages];
-
-        m.push ({
-            author: data.author,
-            text: data.text
-            /** room **/
-        });
-        messages = m;
-        messagesCount += 1;
-    })
-
-    const dispatch = createEventDispatcher ();
-    const currentAuthor = 2;
-    
+    let joinedRoom      = null;
     let messagesCount   = 0;
     let messages        = [ ];
 
@@ -48,6 +19,77 @@
             count: messagesCount
         })
     }
+
+
+
+    function generateDumbName () {
+        const a = [
+            "Pink",
+            "Astonishing",
+            "Great",
+            "Famous",
+            "Bald",
+            "Wise",
+            "Procrastinating",
+            "Brilliant",
+            "Rubbish"
+        ], b = [
+            "Seal",
+            "Alligator",
+            "Elephant",
+            "Cat",
+            "Duck",
+            "Racoon",
+            "Eagle",
+            "Dog",
+            "Ostrich",
+            "Flamingo"
+        ];
+
+        let name = '';
+        name += a[Math.floor(Math.random() * (a.length - 1)) + 1];
+        name += ' ';
+        name += b[Math.floor(Math.random() * (b.length - 1)) + 1];
+
+        return name;
+    }
+
+
+    
+    const socket = io ('http://localhost:3000');
+    socket.on ('connect', function () {
+        socket.emit ('register', { 'username': username });
+        socket.emit ('join', { 'room': 'Tomare' })
+    });
+
+    socket.on ('join', function (data) {
+        console.log ('==> join', data)
+        if (data.joined)
+            joinedRoom = data.room;
+    });
+
+    socket.on ('rooms', function (data) {
+        console.log ('==> rooms', data)
+    });
+
+    socket.on ('chat-message', function  (data) {
+        console.log ('===> chat-message', data);
+
+        var m = [...messages];
+
+        m.push ({
+            id: messagesCount,
+            author: data.author,
+            text: data.text,
+            room: data.room
+        });
+        messages = m;
+        messagesCount += 1;
+    });
+
+    
+    
+    
 
     
 
@@ -75,8 +117,10 @@
     function addMessage (text) {
         var m = [...messages],
             d = {
+                id: messagesCount,
                 author: currentAuthor,
-                text: text
+                text: text,
+                room: joinedRoom
             };
 
         m.push (d);
@@ -84,7 +128,6 @@
 
         messagesCount += 1;
         messages = m;
-        // autoAnswer ();
     }
 
     function handle_messages (data) {
