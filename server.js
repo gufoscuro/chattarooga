@@ -74,5 +74,5 @@ app.get ('/', function (req, res) {
 });
 
 io.on('connection', methods);
-// http.listen(3000)
-http.listen(80)
+http.listen (process.env.PORT || 3000)
+// http.listen(80)

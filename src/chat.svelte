@@ -56,8 +56,7 @@
 
 
     
-    // const socket = io ('http://localhost:3000');
-    const socket = io ('https://chattarooga.herokuapp.com')
+    const socket = io (window.location.href.indexOf ('localhost:') !== -1 ? 'http://localhost:3000' : 'https://chattarooga.herokuapp.com');
     socket.on ('connect', function () {
         socket.emit ('register', { 'username': username });
         socket.emit ('join', { 'room': 'Tomare' })
