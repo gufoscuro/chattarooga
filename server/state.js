@@ -1,8 +1,9 @@
 const _ = require('lodash');
 const rp = require('request-promise')
 
-const animals = ['dog','cat','elephant','crow','ant','cow','donkey','owl','finch','woodcock','capibara','bat','kiwi','kangaroo','chicken',
-                 'turtle','fish','shark','hedgehog','dingo','lynx','rabbit','mouse','rat','hamster','fox','coyote','cockatoo','cockroach']
+const animals = ['dog','cat','elephant','crow','ant','cow','donkey','owl','finch','woodcock','capybara','bat','kiwi','kangaroo','chicken','sheep',
+                 'turtle','fish','shark','hedgehog','dingo','lynx','rabbit','mouse','rat','hamster','fox','coyote','cockatoo','cockroach','goat']
+const others = ['house','thug','boy','girl','book','car','medicine','toddler','window','shoe']
 
 class Users {
     constructor() {
@@ -11,7 +12,11 @@ class Users {
 
     generateName() {
         const animal = animals[Math.floor(Math.random() * animals.length)]
-        return rp.get('https://api.datamuse.com/words?rel_rhy='+animal+'&sp='+animal.charAt(0)+'*')
+        const thing = others[Math.floor(Math.random() * others.length)]
+        return rp.get('https://api.datamuse.com/words?rel_jjb='+thing)
+                    .catch((data) => {
+                        console.log(data)
+                    })
                     .then((data) => {
                         const parsedData = JSON.parse(data)
                         return parsedData[Math.floor(Math.random() * parsedData.length)].word+' '+animal
