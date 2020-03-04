@@ -6,8 +6,7 @@
     export let roomsActive;
 
     const dispatch      = createEventDispatcher ();
-    const username      = generateDumbName ();
-    const currentAuthor = username;
+    var username      = ''
 
     let joinedRoom      = null;
     let messagesCount   = 0;
@@ -21,46 +20,17 @@
     }
 
 
-
-    function generateDumbName () {
-        const a = [
-            "Pink",
-            "Astonishing",
-            "Great",
-            "Famous",
-            "Bald",
-            "Wise",
-            "Procrastinating",
-            "Brilliant",
-            "Rubbish"
-        ], b = [
-            "Seal",
-            "Alligator",
-            "Elephant",
-            "Cat",
-            "Duck",
-            "Racoon",
-            "Eagle",
-            "Dog",
-            "Ostrich",
-            "Flamingo"
-        ];
-
-        let name = '';
-        name += a[Math.floor(Math.random() * (a.length - 1)) + 1];
-        name += ' ';
-        name += b[Math.floor(Math.random() * (b.length - 1)) + 1];
-
-        return name;
-    }
-
-
     
     const socket = io (window.location.href.indexOf ('localhost:') !== -1 ? 'http://localhost:3000' : 'https://chattarooga.herokuapp.com');
     socket.on ('connect', function () {
+        
+    });
+
+    socket.on('username', function(data) {
+        username = data.username
         socket.emit ('register', { 'username': username });
         socket.emit ('join', { 'room': 'Tomare' })
-    });
+    })
 
     socket.on ('join', function (data) {
         console.log ('==> join', data)
@@ -118,7 +88,7 @@
         var m = [...messages],
             d = {
                 id: messagesCount,
-                author: currentAuthor,
+                author: username,
                 text: text,
                 room: joinedRoom
             };
@@ -138,13 +108,13 @@
         // console.log ('handle_writing', data.detail)
         socket.emit ('user-writing', {
             writing: data.detail,
-            author: currentAuthor
+            author: username
         });
     }
 </script>
 
 <div class={"Chat" + (roomsActive ? ' with-rooms' : '')}>
-    <Messages messages={messages} author={currentAuthor} roomsActive={roomsActive} />
+    <Messages messages={messages} author={username} roomsActive={roomsActive} />
     <Input on:message={handle_messages} on:writing={handle_writing} roomsActive={roomsActive} />
 </div>
 

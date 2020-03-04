@@ -60,7 +60,7 @@ const disconnect = (client) => {
  * @param {WebSocket} the websocket client
  */
 const methods = (client) => {
-    console.log('connect');
+    users.generateName().then((data) => client.emit('username', {'username':data}))
     client.on('chat-message', (data) => message(data,client));
     client.on('register',(data) => register(data,client));
     client.on('disconnect', () => disconnect(client));

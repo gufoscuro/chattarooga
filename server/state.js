@@ -1,8 +1,26 @@
-var _ = require('lodash');
+const _ = require('lodash');
+const rp = require('request-promise')
+
+const animals = ['dog','cat','elephant','crow','ant','cow','donkey','owl','finch','woodcock','capibara','bat','kiwi','kangaroo','chicken',
+                 'turtle','fish','shark','hedgehog','dingo','lynx','rabbit','mouse','rat','hamster','fox','coyote','cockatoo','cockroach']
 
 class Users {
     constructor() {
         this.users = []
+    }
+
+    generateName() {
+        const animal = animals[Math.floor(Math.random() * animals.length)]
+        return rp.get('https://api.datamuse.com/words?rel_rhy='+animal+'&sp='+animal.charAt(0)+'*')
+                    .then((data) => {
+                        const parsedData = JSON.parse(data)
+                        return parsedData[Math.floor(Math.random() * parsedData.length)].word+' '+animal
+                    }).then((data) => {
+                        if(this.exists(data))
+                            return this.generateName()
+                        else
+                            return data
+                    })
     }
 
     exists(username){
