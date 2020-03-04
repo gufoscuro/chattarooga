@@ -74,4 +74,5 @@ app.get ('/', function (req, res) {
 });
 
 io.on('connection', methods);
-http.listen(3000)
+// http.listen(3000)
+http.listen(80)
