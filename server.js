@@ -19,7 +19,7 @@ const roomsList = (global,client) => {
 }
 
 const roomUsers = (data,client) => {
-    client.to(data.room).emit('users',rooms.get(data.room).users)
+    client.to(data.room).emit('users',{'room':data.room,'users':rooms.get(data.room).users})
 }
 
 /**
