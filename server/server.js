@@ -4,7 +4,7 @@ const {users,rooms} = require('./state');
 
 /**
  * The register operation
- * @param {object} data 
+ * @param {object} data The minimum object requires a 'username' field
  * @param {WebSocket} client 
  */
 const register = (data,client) => {
@@ -15,7 +15,7 @@ const register = (data,client) => {
 }
 /**
  * Handles the join to a room
- * @param {object} data 
+ * @param {object} data The minimum object requires a 'room' field
  * @param {WebSocket} client 
  */
 const join = (data,client) => {
@@ -24,7 +24,11 @@ const join = (data,client) => {
     client.join(data.room)
     client.emit('join',{'joined':true,'room':data.room})
 }
-
+/**
+ * Leaves a request to leave a room
+ * @param {object} data the minimum object requires 'room' and 'username' fields
+ * @param {WebSocket} client 
+ */
 const leave = (data,client) => {
     rooms.removeUser(data.username)
     client.leave(data.room)
@@ -32,7 +36,7 @@ const leave = (data,client) => {
 }
 /**
  * Handles message requests
- * @param {object} data 
+ * @param {object} data the minimum object requires 'room' and 'message' fields
  * @param {WebSocket} client 
  */
 const message = (data,client) => {
@@ -45,6 +49,10 @@ const message = (data,client) => {
     }
 }
 
+/**
+ * Handles a disconnection request.
+ * @param {WebSocket} client 
+ */
 const disconnect = (client) => {
     new Promise((resolve,reject) => resolve(users.remove(client.username)))
         .then(Promise.all(rooms.disconnectUser(client.username)).then((data) => console.log(data)))
