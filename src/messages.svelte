@@ -39,7 +39,7 @@
             {/if}
             <div class={"clearfix " + (m.author === author ? 'mine' : 'their')}>
                 <div class="message">
-                    {#if (m.text.indexOf ('<pre><code>') !== -1)}
+                    {#if (m.text.indexOf ('<pre><code') !== -1)}
                         <div class="message-code animated softFadeInUp">{@html m.text}</div>
                     {:else}
                         <div class="message-bubble animated softZoomIn">{@html m.text}</div>

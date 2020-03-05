@@ -1,6 +1,8 @@
 <script>
     import io from 'socket.io-client';
     import { Remarkable } from 'remarkable';
+    import remarkableEmoji from 'remarkable-emoji';
+    
 
     import { createEventDispatcher } from 'svelte';
     import Messages from './messages.svelte';
@@ -13,6 +15,9 @@
     const dispatch      = createEventDispatcher ();
     const socket        = io (window.location.href.indexOf ('localhost:') !== -1 ? 
         'http://localhost:3000' : 'https://chattarooga.herokuapp.com');
+    
+    // const messageSound  = new Audio ('./audio/message.mp3')
+    md.use (remarkableEmoji);
 
 
     let username        = ''
@@ -66,6 +71,7 @@
         });
         messages = m;
         messagesCount += 1;
+        // messageSound.play ();
     });
 
 
