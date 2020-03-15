@@ -48,7 +48,7 @@
     }
 </script>
 
-<div class={"Input" + (roomsActive ? ' with-rooms' : '') + (active ? ' active' : '')}>
+<div class={"Input" + (active ? ' active' : '')}>
     <textarea bind:value={message} placeholder="enter message here" bind:this={textarea} on:keydown={handleKeydown} on:keyup={handleKeyup}/>
     <div class="send-button" on:click={sendMessage}>
         <i class="far fa-envelope"></i>
@@ -63,16 +63,13 @@
         left: 0;
         width: 100%;
         min-height: 50px;
-        padding: 0 0 0 50px;
+        padding: 0 0 0 220px;
         background-color: #fff;
         border-top: 1px solid #d5e2ea;
         display: none;
     }
     .Input.active {
         display: block;
-    }
-    .Input.with-rooms {
-        padding: 0 0 0 310px;
     }
     .Input textarea {
         width: 100%;

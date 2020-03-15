@@ -5,11 +5,11 @@
     
 
     import { createEventDispatcher } from 'svelte';
+    import Sidebar from './sidebar.svelte';
     import Messages from './messages.svelte';
     import Input from './input.svelte';
     import Login from './Login.svelte';
     
-    export let roomsActive;
 
     const md            = new Remarkable ();
     const dispatch      = createEventDispatcher ();
@@ -21,34 +21,39 @@
 
 
     let username        = ''
-    let tempUsername    = ''
     let joinedRoom      = null
     let messagesCount   = 0
     let messages        = [ ];
     let loginActive     = false
     let inputActive     = false
 
+    let roomsList       = []
 
-    $: {
-        dispatch ('message', {
-            type: 'update-messages-count',
-            count: messagesCount
-        })
-    }
+
+    // $: {
+    //     dispatch ('message', {
+    //         type: 'update-messages-count',
+    //         count: messagesCount
+    //     })
+    // }
 
 
     
     
     socket.on ('connect', function () {
-        // console.log ('===> connect')
+        console.log ('===> connect')
     });
     
     socket.on ('username', function (data) {
-        tempUsername = data.username;
+        username = data.username;
         loginActive = true;
+        socket.emit ('register', {
+            username: username
+        });
     });
 
     socket.on ('join', function (data) {
+        // console.log ('join');
         if (data.joined) {
             joinedRoom = data.room;
             addMessage ('system', (username + ' connected @ ' + new Date().toLocaleString ()), 'system');
@@ -56,7 +61,8 @@
     });
 
     socket.on ('rooms', function (data) {
-        // console.log ('==> rooms', data)
+        // console.log ('==> rooms', data);
+        roomsList = data;
     });
 
     socket.on ('chat-message', function  (data) {
@@ -106,28 +112,43 @@
         });
     }
 
-    function onLogin () {
-        username = tempUsername;
-        socket.emit ('register', { 'username': username });
-        socket.emit ('join', { 'room': 'Tomare' });
+    function onLogin (event) {
         inputActive = true;
+        if (roomsList.length)
+            joinRoom (roomsList[0])
     }
+
+    function joinRoom (name) {
+        socket.emit ('join', { room: name });
+    }
+
+    function chat_messages (data) {
+		if (data.detail.type === 'update-rooms') {
+			chatRooms = data.detail.rooms;
+		}
+    }
+    
+    function sidebar_messages (event) {
+        const detail = event.detail
+        const action = detail.action
+
+        console.log ('sidebar:messages', detail);
+
+        if (action === 'join-room')
+            joinRoom (detail.roomName);
+	}
 </script>
 
-
-<div class={"Chat" + (roomsActive ? ' with-rooms' : '')}>
-    <Messages messages={messages} author={username} roomsActive={roomsActive} />
-    <Input on:message={new_message} on:writing={handle_writing} active={inputActive} roomsActive={roomsActive} />
+<Sidebar on:message={sidebar_messages} rooms={roomsList} joined={joinedRoom} />
+<div class="Chat">
+    <Messages messages={messages} author={username} />
+    <Input on:message={new_message} on:writing={handle_writing} active={inputActive} />
 </div>
-<Login active={loginActive} username={tempUsername} on:login={onLogin} />
+<Login active={loginActive} username={username} on:login={onLogin} />
 
 
 <style>
     .Chat {
-        padding: 0 0 61px 50px;
-    }
-
-    .Chat.with-rooms {
-        padding: 0 0 61px 310px;
+        padding: 0 0 61px 220px;
     }
 </style>

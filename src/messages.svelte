@@ -3,7 +3,6 @@
 
     export let messages;
     export let author;
-    export let roomsActive;
 
     let messages_ref;
     let scrollY     = 0,
@@ -29,7 +28,7 @@
 
 <svelte:window on:scroll={onWindowScroll}/>
 
-<div class={"Messages" + (roomsActive ? ' with-rooms' : '')} bind:this={messages_ref}>
+<div class="Messages" bind:this={messages_ref}>
     {#each messages as m, i}
         {#if (m.type === 'system')}
             <div class="system-message">{m.text}</div>
@@ -88,7 +87,7 @@
 
     .Messages {
         padding: 10px;
-        width: 60%
+        /* width: 60% */
     }
 
     .Messages.with-rooms {

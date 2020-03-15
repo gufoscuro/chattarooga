@@ -2,6 +2,7 @@
     import { createEventDispatcher } from 'svelte';
     export let username;
     export let active;
+    
     let visible = true;
 
     const dispatch = createEventDispatcher ();
@@ -18,10 +19,10 @@
 <div class={"Login" + (active ? ' active' : '') + (visible ? ' visible' : '')}>
     <div class="pane">
         <div class="welcome">
-            <div>Tell us when you're ready to be</div>
+            <div>You are</div>
             <div class="username">{username}</div>
         </div>
-        <button class="btn btn-primary login-btn" on:click={handleClick}>I am ready</button>
+        <button class="btn btn-primary login-btn" on:click={handleClick}>Let's go!</button>
     </div>
 </div>
 
@@ -44,7 +45,7 @@
         -moz-transition: all 0.3s;
         transition: all 0.3s;
         display: none;
-        z-index: 33;
+        z-index: 29;
     }
 
     .Login .pane {
@@ -64,6 +65,13 @@
     .Login .welcome .username {
         font-size: 38px;
         font-weight: 600;
+    }
+
+    .Login .room-field {
+        border: none;
+        border-bottom: 1px solid #a4b9bf;
+        outline: none;
+        padding: 10px 20px;
     }
 
     .Login .login-btn {
