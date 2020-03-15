@@ -61,13 +61,16 @@
     }
 
     .Sidebar .logo {
+        padding: 15px 15px 10px;
         line-height: 55px;
         color: #fff;
         /* text-align: center; */
-        padding: 0 15px;
         font-size: 20px;
         cursor: default;
         color: #72c2ff;
+        
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
     }
 
     .Sidebar .logo .icn {
