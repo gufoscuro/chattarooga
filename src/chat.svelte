@@ -115,7 +115,9 @@
     function onLogin (event) {
         inputActive = true;
         if (roomsList.length)
-            joinRoom (roomsList[0])
+            joinRoom (roomsList[0]);
+        else
+            joinRoom ('General');
     }
 
     function joinRoom (name) {
