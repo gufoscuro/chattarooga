@@ -65,7 +65,8 @@
         min-height: 50px;
         padding: 0 0 0 220px;
         background-color: #fff;
-        border-top: 1px solid #d5e2ea;
+        /* border-top: 1px solid #d5e2ea; */
+        border-top: 1px solid #aebec7;
         display: none;
     }
     .Input.active {

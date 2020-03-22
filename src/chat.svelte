@@ -21,22 +21,19 @@
 
 
     let username        = ''
-    let joinedRoom      = null
-    let messagesCount   = 0
     let messages        = [ ];
+    let joinedRoom      = null
     let loginActive     = false
     let inputActive     = false
 
-    let roomsList       = []
+    let roomsList       = [ ]
+    let roomsMessages   = { }
 
-
-    // $: {
-    //     dispatch ('message', {
-    //         type: 'update-messages-count',
-    //         count: messagesCount
-    //     })
-    // }
-
+    
+    $: {
+        console.log ('joinedRoom', joinedRoom, roomsMessages)
+        messages = roomsMessages[joinedRoom] || []
+    }
 
     
     
@@ -53,7 +50,6 @@
     });
 
     socket.on ('join', function (data) {
-        // console.log ('join');
         if (data.joined) {
             joinedRoom = data.room;
             addMessage ('system', (username + ' connected @ ' + new Date().toLocaleString ()), 'system');
@@ -61,42 +57,47 @@
     });
 
     socket.on ('rooms', function (data) {
-        // console.log ('==> rooms', data);
         roomsList = data;
     });
 
     socket.on ('chat-message', function  (data) {
-        var m = [...messages];
-        
-        m.push ({
-            id: messagesCount,
+        console.log ('chat messages', data)
+
+        var d = {
             type: data.type,
             author: data.author,
             text: data.text,
             room: data.room
-        });
-        messages = m;
-        messagesCount += 1;
-        // messageSound.play ();
+        };
+        
+        pushNewMessage (d)
     });
 
 
+    function pushNewMessage (data) {
+        console.log ('pushNewMessage', data);
+        if (data.room !== undefined) {
+            if (roomsMessages[data.room] === undefined)
+                roomsMessages[data.room] = [];
 
+            let m = [ ...roomsMessages[data.room] ];
+            if (m > 10)
+                m.shift ();
+            m.push (data);
+            roomsMessages[data.room] = m;
+        }
+    }
 
     function addMessage (author, text, type = 'user-message') {
-        var m = [...messages],
-            d = {
+        var d = {
                 type: type,
                 author: author,
                 text: text,
                 room: joinedRoom
             };
 
-        m.push (d);
+        pushNewMessage (d);
         socket.emit ('chat-message', d);
-
-        messagesCount += 1;
-        messages = m;
     }
 
     function new_message (data) {
@@ -121,6 +122,17 @@
     }
 
     function joinRoom (name) {
+        const rooms = [ ...roomsList ]
+        if (rooms.indexOf (name) === -1) {
+            rooms.push (name);
+
+            if (roomsMessages[name] === undefined)
+                roomsMessages[name] = [];
+
+            roomsList = rooms;
+        }
+
+        
         socket.emit ('join', { room: name });
     }
 
